@@ -108,6 +108,8 @@ from .inputs import (
     validate_all_inputs,
 )
 from .outputs import (
+    InputHeating,
+    InputIonization,
     BrightnessTemp,
     Coeval,
     HaloField,
@@ -2065,6 +2067,69 @@ def brightness_temperature(
             perturbed_field=perturbed_field,
             hooks=hooks,
         )
+
+
+def input_heating(*, redshift, init_boxes, user_params=None, cosmo_params=None,
+                  random_seed=None, regenerate=None, write=None, direc=None,
+                  hooks: dict[Callable, dict[str, Any]] | None = None,
+                  **global_kwargs,
+) -> InputHeating:
+
+    r"""
+    Initialize a input heating box.
+
+    :class:`InputHeating` instance.
+    """
+
+    direc, regenerate, hooks = _get_config_options(direc, regenerate, write, hooks)
+
+    with global_params.use(**global_kwargs):
+        random_seed, user_params, cosmo_params, redshift = _setup_inputs(
+            {
+                "random_seed": random_seed,
+                "user_params": user_params,
+                "cosmo_params": cosmo_params,
+            },
+            input_boxes={"init_boxes": init_boxes},
+            redshift=redshift,
+        )
+
+        box = InputHeating(redshift=redshift, user_params=user_params,
+                           cosmo_params=cosmo_params, random_seed=random_seed,
+        )
+
+        return box.compute(ics=init_boxes, hooks=hooks)
+
+def input_ionization(*, redshift, init_boxes, user_params=None, cosmo_params=None,
+                  random_seed=None, regenerate=None, write=None, direc=None,
+                  hooks: dict[Callable, dict[str, Any]] | None = None,
+                  **global_kwargs,
+) -> InputIonization:
+
+    r"""
+    Initialize a input ionization box.
+
+    :class:`InputIonizatin` instance.
+    """
+
+    direc, regenerate, hooks = _get_config_options(direc, regenerate, write, hooks)
+
+    with global_params.use(**global_kwargs):
+        random_seed, user_params, cosmo_params, redshift = _setup_inputs(
+            {
+                "random_seed": random_seed,
+                "user_params": user_params,
+                "cosmo_params": cosmo_params,
+            },
+            input_boxes={"init_boxes": init_boxes},
+            redshift=redshift,
+        )
+
+        box = InputIonization(redshift=redshift, user_params=user_params,
+                              cosmo_params=cosmo_params, random_seed=random_seed,
+        )
+
+        return box.compute(ics=init_boxes, hooks=hooks)
 
 
 def _logscroll_redshifts(min_redshift, z_step_factor, zmax):

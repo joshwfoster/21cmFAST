@@ -675,6 +675,49 @@ class BrightnessTemp(_AllParamsBox):
             hooks=hooks,
         )
 
+class InputHeating(_OutputStructZ):
+    """A class containing the brightness temperature box."""
+
+    _c_compute_function = lib.InitInputHeating
+
+    _meta = False
+    _filter_params = _OutputStruct._filter_params
+
+    def _get_box_structures(self) -> dict[str, dict | tuple[int]]:
+        return {"input_heating": (self.user_params.HII_DIM,) * 3}
+
+    def get_required_input_arrays(self, input_box: _BaseOutputStruct) -> list[str]:
+        """Return all input arrays required to compute this object."""
+        return []
+
+    def compute(self, *, ics: InitialConditions, hooks: dict):
+
+        """Compute the function."""
+        return self._compute(self.user_params, self.cosmo_params, hooks=hooks)
+
+
+
+class InputIonization(_OutputStructZ):
+    """A class containing the brightness temperature box."""
+
+    _c_compute_function = lib.InitInputIonization
+
+    _meta = False
+    _filter_params = _OutputStruct._filter_params
+
+    def _get_box_structures(self) -> dict[str, dict | tuple[int]]:
+        return {"input_ionization": (self.user_params.HII_DIM,) * 3}
+
+    def get_required_input_arrays(self, input_box: _BaseOutputStruct) -> list[str]:
+        """Return all input arrays required to compute this object."""
+        return []
+
+    def compute(self, *, ics: InitialConditions, hooks: dict):
+
+        """Compute the function."""
+        return self._compute(self.user_params, self.cosmo_params, hooks=hooks)
+
+
 
 class _HighLevelOutput:
     def get_cached_data(
@@ -730,6 +773,8 @@ class _HighLevelOutput:
             "ionized_box": IonizedBox,
             "spin_temp": TsBox,
             "brightness_temp": BrightnessTemp,
+            "input_heating": InputHeating,
+            "input_ionization": InputIonization,
         }
         cls = kinds[kind]
 
@@ -749,6 +794,8 @@ class _HighLevelOutput:
             "ionized_box",
             "spin_temp",
             "brightness_temp",
+            "input_heating",
+            "input_ionization",
         ]
 
         clean = kinds if clean and not hasattr(clean, "__len__") else clean or []

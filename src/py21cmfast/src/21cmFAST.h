@@ -142,6 +142,14 @@ struct BrightnessTemp{
     float *brightness_temp;
 };
 
+struct InputHeating{
+    float *input_heating;
+};
+
+struct InputIonization{
+    float *input_ionization;
+};
+
 int ComputeInitialConditions(unsigned long long random_seed, struct UserParams *user_params, struct CosmoParams *cosmo_params, struct InitialConditions *boxes);
 
 int ComputePerturbField(float redshift, struct UserParams *user_params, struct CosmoParams *cosmo_params, struct InitialConditions *boxes, struct PerturbedField *perturbed_field);
@@ -165,6 +173,10 @@ int ComputeIonizedBox(float redshift, float prev_redshift, struct UserParams *us
                        struct PerturbedField *previous_perturbed_field, struct IonizedBox *previous_ionize_box,
                        struct TsBox *spin_temp, struct PerturbHaloField *halo, struct InitialConditions *ini_boxes,
                        struct IonizedBox *box);
+
+int InitInputHeating(struct UserParams *user_params, struct CosmoParams *cosmo_params, struct InputHeating *box);
+
+int InitInputIonization(struct UserParams *user_params, struct CosmoParams *cosmo_params, struct InputIonization *box);
 
 int ComputeBrightnessTemp(float redshift, struct UserParams *user_params, struct CosmoParams *cosmo_params,
                            struct AstroParams *astro_params, struct FlagOptions *flag_options,

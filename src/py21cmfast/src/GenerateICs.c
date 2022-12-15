@@ -35,6 +35,8 @@
 #include "IonisationBox.c"
 #include "SpinTemperatureBox.c"
 #include "BrightnessTemperatureBox.c"
+#include "InputHeatingBox.c"
+#include "InputIonizationBox.c"
 #include "FindHaloes.c"
 #include "PerturbHaloField.c"
 
