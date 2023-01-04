@@ -1710,6 +1710,8 @@ def spin_temperature(
     redshift=None,
     perturbed_field=None,
     previous_spin_temp=None,
+    input_heating_box=None,
+    input_ionization_box=None,
     init_boxes=None,
     cosmo_params=None,
     user_params=None,
@@ -1959,6 +1961,17 @@ def spin_temperature(
                     cleanup=False,  # we know we'll need the memory again
                 )
 
+        # Dynamically produce the input fields as null if not computed
+        if input_heating_box is None or not input_heating_box.is_computed:
+            input_heating_box = input_heating(redshift = redshift, 
+                                              init_boxes = init_boxes,
+                                              write = False)
+    
+        if input_ionization_box is None or not input_ionization_box.is_computed:
+            input_ionization_box = input_ionization(redshift = redshift,
+                                                    init_boxes = init_boxes,
+                                                    write = False)
+
         # Dynamically produce the perturbed field.
         if perturbed_field is None or not perturbed_field.is_computed:
             perturbed_field = perturb_field(
@@ -1974,6 +1987,8 @@ def spin_temperature(
             cleanup=cleanup,
             perturbed_field=perturbed_field,
             prev_spin_temp=previous_spin_temp,
+            input_heating_box=input_heating_box,
+            input_ionization_box=input_ionization_box,
             ics=init_boxes,
             hooks=hooks,
         )

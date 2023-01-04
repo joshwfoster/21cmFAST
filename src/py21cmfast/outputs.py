@@ -390,8 +390,8 @@ class TsBox(_AllParamsBox):
 
     _c_compute_function = lib.ComputeTsBox
     _meta = False
-    _inputs = _AllParamsBox._inputs + ("prev_spin_redshift", "perturbed_field_redshift")
-
+    _inputs = _AllParamsBox._inputs + ("prev_spin_redshift", "perturbed_field_redshift") 
+    
     def __init__(
         self,
         *,
@@ -460,9 +460,14 @@ class TsBox(_AllParamsBox):
             ]
             if self.flag_options.USE_MINI_HALOS:
                 required += ["J_21_LW_box"]
+        elif isinstance(input_box, InputHeating):
+            required += ["input_heating"]
+        elif isinstance(input_box, InputIonization):
+            required += ["input_ionization"]
+
         else:
             raise ValueError(
-                f"{type(input_box)} is not an input required for PerturbHaloField!"
+                f"{type(input_box)} is not an input required for TsBox!"
             )
 
         return required
@@ -473,9 +478,12 @@ class TsBox(_AllParamsBox):
         cleanup: bool,
         perturbed_field: PerturbedField,
         prev_spin_temp,
+        input_heating_box: InputHeating,
+        input_ionization_box: InputIonization,
         ics: InitialConditions,
         hooks: dict,
     ):
+
         """Compute the function."""
         return self._compute(
             self.redshift,
@@ -488,6 +496,8 @@ class TsBox(_AllParamsBox):
             cleanup,
             perturbed_field,
             prev_spin_temp,
+            input_heating_box,
+            input_ionization_box,
             ics,
             hooks=hooks,
         )
