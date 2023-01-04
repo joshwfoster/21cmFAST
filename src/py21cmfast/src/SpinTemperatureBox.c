@@ -41,6 +41,7 @@ int ComputeTsBox(float redshift, float prev_redshift, struct UserParams *user_pa
                   struct AstroParams *astro_params, struct FlagOptions *flag_options,
                   float perturbed_field_redshift, short cleanup,
                   struct PerturbedField *perturbed_field, struct TsBox *previous_spin_temp,
+                  struct InputHeating *input_heating, struct InputIonization *input_ionization,
                   struct InitialConditions *ini_boxes, struct TsBox *this_spin_temp) {
     int status;
     Try{ // This Try{} wraps the whole function.
@@ -1841,7 +1842,7 @@ LOG_SUPER_DEBUG("looping over box...");
                             prefactor_2,delNL0,growth_factor_zp,dt_dzp,zp,dgrowth_factor_dzp,dcomp_dzp_prefactor,Trad_fast,dzp,TS_prefactor,\
                             xc_inverse,Trad_fast_inv,dstarlyLW_dt_box,dstarlyLW_dt_prefactor,dxheat_dt_box_MINI,dxion_source_dt_box_MINI,\
                             dxlya_dt_box_MINI,dstarlya_dt_box_MINI,dstarlyLW_dt_box_MINI,dfcoll_dz_val_MINI,del_fcoll_Rct_MINI,\
-                            dstarlya_dt_prefactor_MINI,dstarlyLW_dt_prefactor_MINI,prefactor_2_MINI,const_zp_prefactor_MINI) \
+                            dstarlya_dt_prefactor_MINI,dstarlyLW_dt_prefactor_MINI,prefactor_2_MINI,const_zp_prefactor_MINI, input_heating, input_ionization) \
                     private(box_ct,x_e,T,dxion_sink_dt,dxe_dzp,dadia_dzp,dspec_dzp,dcomp_dzp,dxheat_dzp,J_alpha_tot,T_inv,T_inv_sq,\
                             xc_fast,xi_power,xa_tilde_fast_arg,TS_fast,TSold_fast,xa_tilde_fast,dxheat_dzp_MINI,J_alpha_tot_MINI,curr_delNL0) \
                     num_threads(user_params->N_THREADS)
@@ -1958,16 +1959,16 @@ LOG_SUPER_DEBUG("looping over box...");
                             }
 
                             //update quantities
-                            x_e += ( dxe_dzp ) * dzp; // remember dzp is negative
+                            x_e += ( dxe_dzp ) * dzp + input_ionization->input_ionization[box_ct]; // remember dzp is negative
                             if (x_e > 1) // can do this late in evolution if dzp is too large
                                 x_e = 1 - FRACT_FLOAT_ERR;
                             else if (x_e < 0)
                                 x_e = 0;
                             if (T < MAX_TK) {
                                 if (flag_options->USE_MINI_HALOS){
-                                    T += ( dxheat_dzp + dxheat_dzp_MINI + dcomp_dzp + dspec_dzp + dadia_dzp ) * dzp;
+                                    T += ( dxheat_dzp + dxheat_dzp_MINI + dcomp_dzp + dspec_dzp + dadia_dzp ) * dzp + input_heating->input_heating[box_ct];
                                 } else {
-                                    T += ( dxheat_dzp + dcomp_dzp + dspec_dzp + dadia_dzp ) * dzp;
+                                    T += ( dxheat_dzp + dcomp_dzp + dspec_dzp + dadia_dzp ) * dzp + input_heating->input_heating[box_ct];
                                 }
 
                             }
@@ -2155,13 +2156,13 @@ LOG_SUPER_DEBUG("looping over box...");
                     dxheat_dzp = dxheat_dt * dt_dzp * 2.0 / 3.0 / k_B / (1.0+x_e);
                     //update quantities
 
-                    x_e += ( dxe_dzp ) * dzp; // remember dzp is negative
+                    x_e += ( dxe_dzp ) * dzp + input_ionization->input_ionization[box_ct]; // remember dzp is negative
                     if (x_e > 1) // can do this late in evolution if dzp is too large
                         x_e = 1 - FRACT_FLOAT_ERR;
                     else if (x_e < 0)
                         x_e = 0;
                     if (T < MAX_TK) {
-                        T += ( dxheat_dzp + dcomp_dzp + dspec_dzp + dadia_dzp ) * dzp;
+                        T += ( dxheat_dzp + dcomp_dzp + dspec_dzp + dadia_dzp ) * dzp + input_heating->input_heating[box_ct];
                     }
 
                     if (T<0){ // spurious bahaviour of the trapazoidalintegrator. generally overcooling in underdensities
