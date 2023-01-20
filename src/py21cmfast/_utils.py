@@ -1370,6 +1370,7 @@ class OutputStruct(StructWrapper, metaclass=ABCMeta):
         pass
 
     def ensure_input_computed(self, input_box, load=False) -> bool:
+
         """Ensure all the inputs have been computed."""
         if input_box.dummy:
             return True
@@ -1422,6 +1423,7 @@ class OutputStruct(StructWrapper, metaclass=ABCMeta):
                 logger.debug(f"    {arg}")
 
     def _ensure_arguments_exist(self, *args):
+
         for arg in args:
             if (
                 isinstance(arg, OutputStruct)
