@@ -464,6 +464,8 @@ class TsBox(_AllParamsBox):
             required += ["input_heating"]
         elif isinstance(input_box, InputIonization):
             required += ["input_ionization"]
+        elif isinstance(input_box, InputJAlpha):
+            required += ["input_jalpha"]
 
         else:
             raise ValueError(
@@ -480,6 +482,7 @@ class TsBox(_AllParamsBox):
         prev_spin_temp,
         input_heating_box: InputHeating,
         input_ionization_box: InputIonization,
+        input_jalpha_box: InputJAlpha,
         ics: InitialConditions,
         hooks: dict,
     ):
@@ -498,6 +501,7 @@ class TsBox(_AllParamsBox):
             prev_spin_temp,
             input_heating_box,
             input_ionization_box,
+            input_jalpha_box,
             ics,
             hooks=hooks,
         )
@@ -686,7 +690,7 @@ class BrightnessTemp(_AllParamsBox):
         )
 
 class InputHeating(_OutputStructZ):
-    """A class containing the brightness temperature box."""
+    """A class containing the input heating box."""
 
     _c_compute_function = lib.InitInputHeating
 
@@ -708,7 +712,7 @@ class InputHeating(_OutputStructZ):
 
 
 class InputIonization(_OutputStructZ):
-    """A class containing the brightness temperature box."""
+    """A class containing the input ionization box."""
 
     _c_compute_function = lib.InitInputIonization
 
@@ -717,6 +721,26 @@ class InputIonization(_OutputStructZ):
 
     def _get_box_structures(self) -> dict[str, dict | tuple[int]]:
         return {"input_ionization": (self.user_params.HII_DIM,) * 3}
+
+    def get_required_input_arrays(self, input_box: _BaseOutputStruct) -> list[str]:
+        """Return all input arrays required to compute this object."""
+        return []
+
+    def compute(self, *, ics: InitialConditions, hooks: dict):
+
+        """Compute the function."""
+        return self._compute(self.user_params, self.cosmo_params, hooks=hooks)
+
+class InputJAlpha(_OutputStructZ):
+    """A class containing the input JAlpha box."""
+
+    _c_compute_function = lib.InitInputJAlpha
+
+    _meta = False
+    _filter_params = _OutputStruct._filter_params
+
+    def _get_box_structures(self) -> dict[str, dict | tuple[int]]:
+        return {"input_jalpha": (self.user_params.HII_DIM,) * 3}
 
     def get_required_input_arrays(self, input_box: _BaseOutputStruct) -> list[str]:
         """Return all input arrays required to compute this object."""
@@ -785,6 +809,7 @@ class _HighLevelOutput:
             "brightness_temp": BrightnessTemp,
             "input_heating": InputHeating,
             "input_ionization": InputIonization,
+            "input_jalpha": InputJAlpha,
         }
         cls = kinds[kind]
 
@@ -806,6 +831,7 @@ class _HighLevelOutput:
             "brightness_temp",
             "input_heating",
             "input_ionization",
+            "input_jalpha",
         ]
 
         clean = kinds if clean and not hasattr(clean, "__len__") else clean or []

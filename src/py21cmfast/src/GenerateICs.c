@@ -37,6 +37,7 @@
 #include "BrightnessTemperatureBox.c"
 #include "InputHeatingBox.c"
 #include "InputIonizationBox.c"
+#include "InputJAlphaBox.c"
 #include "FindHaloes.c"
 #include "PerturbHaloField.c"
 

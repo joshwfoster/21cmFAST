@@ -41,7 +41,7 @@ int ComputeTsBox(float redshift, float prev_redshift, struct UserParams *user_pa
                   struct AstroParams *astro_params, struct FlagOptions *flag_options,
                   float perturbed_field_redshift, short cleanup,
                   struct PerturbedField *perturbed_field, struct TsBox *previous_spin_temp,
-                  struct InputHeating *input_heating, struct InputIonization *input_ionization,
+                  struct InputHeating *input_heating, struct InputIonization *input_ionization, struct InputJAlpha *input_jalpha,
                   struct InitialConditions *ini_boxes, struct TsBox *this_spin_temp) {
     int status;
     Try{ // This Try{} wraps the whole function.
@@ -1842,7 +1842,8 @@ LOG_SUPER_DEBUG("looping over box...");
                             prefactor_2,delNL0,growth_factor_zp,dt_dzp,zp,dgrowth_factor_dzp,dcomp_dzp_prefactor,Trad_fast,dzp,TS_prefactor,\
                             xc_inverse,Trad_fast_inv,dstarlyLW_dt_box,dstarlyLW_dt_prefactor,dxheat_dt_box_MINI,dxion_source_dt_box_MINI,\
                             dxlya_dt_box_MINI,dstarlya_dt_box_MINI,dstarlyLW_dt_box_MINI,dfcoll_dz_val_MINI,del_fcoll_Rct_MINI,\
-                            dstarlya_dt_prefactor_MINI,dstarlyLW_dt_prefactor_MINI,prefactor_2_MINI,const_zp_prefactor_MINI, input_heating, input_ionization) \
+                            dstarlya_dt_prefactor_MINI,dstarlyLW_dt_prefactor_MINI,prefactor_2_MINI,const_zp_prefactor_MINI,\
+                            input_heating, input_ionization, input_jalpha) \
                     private(box_ct,x_e,T,dxion_sink_dt,dxe_dzp,dadia_dzp,dspec_dzp,dcomp_dzp,dxheat_dzp,J_alpha_tot,T_inv,T_inv_sq,\
                             xc_fast,xi_power,xa_tilde_fast_arg,TS_fast,TSold_fast,xa_tilde_fast,dxheat_dzp_MINI,J_alpha_tot_MINI,curr_delNL0) \
                     num_threads(user_params->N_THREADS)
@@ -1980,7 +1981,7 @@ LOG_SUPER_DEBUG("looping over box...");
                             this_spin_temp->x_e_box[box_ct] = x_e;
                             this_spin_temp->Tk_box[box_ct] = T;
 
-                            J_alpha_tot = ( dxlya_dt_box[box_ct] + dstarlya_dt_box[box_ct] ); //not really d/dz, but the lya flux
+                            J_alpha_tot = ( dxlya_dt_box[box_ct] + dstarlya_dt_box[box_ct] + input_jalpha->input_jalpha[box_ct]); //not really d/dz, but the lya flux
                             if (flag_options->USE_MINI_HALOS){
                                 J_alpha_tot_MINI = ( dxlya_dt_box_MINI[box_ct] + dstarlya_dt_box_MINI[box_ct] ); //not really d/dz, but the lya flux
                                 this_spin_temp->J_21_LW_box[box_ct] = dstarlyLW_dt_box[box_ct] + dstarlyLW_dt_box_MINI[box_ct];
@@ -2059,7 +2060,8 @@ LOG_SUPER_DEBUG("looping over box...");
 #pragma omp parallel shared(previous_spin_temp,x_int_XHII,inverse_diff,delNL0_rev,dens_grid_int_vals,ST_over_PS,zpp_growth,dfcoll_interp1,\
                             density_gridpoints,dfcoll_interp2,freq_int_heat_tbl_diff,freq_int_heat_tbl,freq_int_ion_tbl_diff,freq_int_ion_tbl,\
                             freq_int_lya_tbl_diff,freq_int_lya_tbl,dstarlya_dt_prefactor,const_zp_prefactor,prefactor_1,growth_factor_zp,dzp,\
-                            dt_dzp,dgrowth_factor_dzp,dcomp_dzp_prefactor,this_spin_temp,xc_inverse,TS_prefactor,xa_tilde_prefactor,Trad_fast_inv) \
+                            dt_dzp,dgrowth_factor_dzp,dcomp_dzp_prefactor,this_spin_temp,xc_inverse,TS_prefactor,xa_tilde_prefactor,Trad_fast_inv,\
+                            input_heating, input_ionization, input_jalpha,) \
                     private(box_ct,x_e,T,xHII_call,m_xHII_low,inverse_val,dxheat_dt,dxion_source_dt,dxlya_dt,dstarlya_dt,curr_delNL0,R_ct,\
                             dfcoll_dz_val,dxion_sink_dt,dxe_dzp,dadia_dzp,dspec_dzp,dcomp_dzp,J_alpha_tot,T_inv,T_inv_sq,xc_fast,xi_power,\
                             xa_tilde_fast_arg,TS_fast,TSold_fast,xa_tilde_fast) \
@@ -2172,7 +2174,7 @@ LOG_SUPER_DEBUG("looping over box...");
                     this_spin_temp->x_e_box[box_ct] = x_e;
                     this_spin_temp->Tk_box[box_ct] = T;
 
-                    J_alpha_tot = ( dxlya_dt + dstarlya_dt ); //not really d/dz, but the lya flux
+                    J_alpha_tot = ( dxlya_dt + dstarlya_dt + input_jalpha->input_jalpha[box_ct]); //not really d/dz, but the lya flux
 
                     // Note: to make the code run faster, the get_Ts function call to evaluate the spin temperature was replaced with the code below.
                     // Algorithm is the same, but written to be more computationally efficient

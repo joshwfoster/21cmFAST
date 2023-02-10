@@ -150,6 +150,11 @@ struct InputIonization{
     float *input_ionization;
 };
 
+struct InputJAlpha{
+    float *input_jalpha;
+};
+
+
 int ComputeInitialConditions(unsigned long long random_seed, struct UserParams *user_params, struct CosmoParams *cosmo_params, struct InitialConditions *boxes);
 
 int ComputePerturbField(float redshift, struct UserParams *user_params, struct CosmoParams *cosmo_params, struct InitialConditions *boxes, struct PerturbedField *perturbed_field);
@@ -166,7 +171,7 @@ int ComputeTsBox(float redshift, float prev_redshift, struct UserParams *user_pa
                   struct AstroParams *astro_params, struct FlagOptions *flag_options, float perturbed_field_redshift,
                   short cleanup,
                   struct PerturbedField *perturbed_field, struct TsBox *previous_spin_temp, 
-                  struct InputHeating *input_heating, struct InputIonization *input_ionization,
+                  struct InputHeating *input_heating, struct InputIonization *input_ionization, struct InputJAlpha *input_jalpha,
                   struct InitialConditions *ini_boxes,
                   struct TsBox *this_spin_temp);
 
@@ -179,6 +184,8 @@ int ComputeIonizedBox(float redshift, float prev_redshift, struct UserParams *us
 int InitInputHeating(struct UserParams *user_params, struct CosmoParams *cosmo_params, struct InputHeating *box);
 
 int InitInputIonization(struct UserParams *user_params, struct CosmoParams *cosmo_params, struct InputIonization *box);
+
+int InitInputJAlpha(struct UserParams *user_params, struct CosmoParams *cosmo_params, struct InputJAlpha *box);
 
 int ComputeBrightnessTemp(float redshift, struct UserParams *user_params, struct CosmoParams *cosmo_params,
                            struct AstroParams *astro_params, struct FlagOptions *flag_options,

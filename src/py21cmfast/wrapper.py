@@ -110,6 +110,7 @@ from .inputs import (
 from .outputs import (
     InputHeating,
     InputIonization,
+    InputJAlpha,
     BrightnessTemp,
     Coeval,
     HaloField,
@@ -1712,6 +1713,7 @@ def spin_temperature(
     previous_spin_temp=None,
     input_heating_box=None,
     input_ionization_box=None,
+    input_jalpha_box=None,
     init_boxes=None,
     cosmo_params=None,
     user_params=None,
@@ -1972,6 +1974,13 @@ def spin_temperature(
                                                     init_boxes = init_boxes,
                                                     write = False)
 
+
+        if input_jalpha_box is None or not input_jalpha_box.is_computed:
+            input_jalpha_box = input_jalpha(redshift = redshift,
+                                                init_boxes = init_boxes,
+                                                write = False)
+
+
         # Dynamically produce the perturbed field.
         if perturbed_field is None or not perturbed_field.is_computed:
             perturbed_field = perturb_field(
@@ -1981,6 +1990,7 @@ def spin_temperature(
                 hooks=hooks,
                 direc=direc,
             )
+        print('Just Before Box Evaluation')
 
         # Run the C Code
         return box.compute(
@@ -1989,6 +1999,7 @@ def spin_temperature(
             prev_spin_temp=previous_spin_temp,
             input_heating_box=input_heating_box,
             input_ionization_box=input_ionization_box,
+            input_jalpha_box=input_jalpha_box,
             ics=init_boxes,
             hooks=hooks,
         )
@@ -2124,7 +2135,7 @@ def input_ionization(*, redshift, init_boxes, user_params=None, cosmo_params=Non
     r"""
     Initialize a input ionization box.
 
-    :class:`InputIonizatin` instance.
+    :class:`InputIonization` instance.
     """
 
     direc, regenerate, hooks = _get_config_options(direc, regenerate, write, hooks)
@@ -2146,6 +2157,36 @@ def input_ionization(*, redshift, init_boxes, user_params=None, cosmo_params=Non
 
         return box.compute(ics=init_boxes, hooks=hooks)
 
+def input_jalpha(*, redshift, init_boxes, user_params=None, cosmo_params=None,
+                  random_seed=None, regenerate=None, write=None, direc=None,
+                  hooks: dict[Callable, dict[str, Any]] | None = None,
+                  **global_kwargs,
+) -> InputJAlpha:
+
+    r"""
+    Initialize a input JAlpha box.
+
+    :class:`InputJAlpha` instance.
+    """
+
+    direc, regenerate, hooks = _get_config_options(direc, regenerate, write, hooks)
+
+    with global_params.use(**global_kwargs):
+        random_seed, user_params, cosmo_params, redshift = _setup_inputs(
+            {
+                "random_seed": random_seed,
+                "user_params": user_params,
+                "cosmo_params": cosmo_params,
+            },
+            input_boxes={"init_boxes": init_boxes},
+            redshift=redshift,
+        )
+
+        box = InputJAlpha(redshift=redshift, user_params=user_params,
+                              cosmo_params=cosmo_params, random_seed=random_seed,
+        )
+
+        return box.compute(ics=init_boxes, hooks=hooks)
 
 def _logscroll_redshifts(min_redshift, z_step_factor, zmax):
     redshifts = [min_redshift]
