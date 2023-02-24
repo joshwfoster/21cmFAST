@@ -1990,7 +1990,7 @@ def spin_temperature(
                 hooks=hooks,
                 direc=direc,
             )
-        print('Just Before Box Evaluation')
+        logger.info('Just Before Box Evaluation')
 
         # Run the C Code
         return box.compute(
