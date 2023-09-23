@@ -1,10 +1,10 @@
-name: 21cmfast
+name: dm21cm
 channels:
   - conda-forge
   - anaconda
   - defaults
 dependencies:
-  - python=3.7
+  - python=3.10
   - sphinxcontrib-htmlhelp
   - zlib
   - pip

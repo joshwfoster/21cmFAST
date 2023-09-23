@@ -633,7 +633,7 @@ class FlagOptions(StructWithDefaults):
     _defaults_ = {
         "USE_HALO_FIELD": False,
         "USE_MINI_HALOS": False,
-        "USE_MASS_DEPENDENT_ZETA": False,
+        "USE_MASS_DEPENDENT_ZETA": True,
         "SUBCELL_RSD": False,
         "INHOMO_RECO": False,
         "USE_TS_FLUCT": False,
