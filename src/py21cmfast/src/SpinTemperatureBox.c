@@ -1964,28 +1964,27 @@ LOG_SUPER_DEBUG("looping over box...");
 
                             // YS DEBUG: print box_ct and dadia_dzp
                             if (box_ct == 0) {
-                                printf("box_ct = %d\n", box_ct);
-                                printf("dzp = %e\n", dzp);
-                                printf("zp = %e\n", zp);
-                                printf("dt_dzp = %e\n", dt_dzp);
-                                printf("dadia_dzp * dzp = %e\n", dadia_dzp * dzp);
-                                printf("dspec_dzp * dzp = %e\n", dspec_dzp * dzp);
-                                printf("dcomp_dzp * dzp = %e\n", dcomp_dzp * dzp);
-                                printf("dxheat_dzp * dzp = %e\n", dxheat_dzp * dzp);
-                                printf("input heating = %e\n", input_heating->input_heating[box_ct]);
-                                printf("dxion_source = %e\n", dt_dzp*dxion_source_dt_box[box_ct]*dzp);
-                                printf("dxion_sink = %e\n", dt_dzp*dxion_sink_dt*dzp);
-                                printf("T = %e\n", T);
-                                printf("alpha_A(T) = %e\n", alpha_A(T));
-                                printf("global_params.CLUMPING_FACTOR = %e\n", global_params.CLUMPING_FACTOR);
-                                printf("x_e = %e\n", x_e);
-                                printf("f_H = %e\n", f_H);
-                                printf("prefactor_1 = %e\n", prefactor_1);
-                                printf("curr_delNL0 = %e\n", curr_delNL0);
-                                printf("growth_factor_zp = %e\n", growth_factor_zp);
-                                printf("input ionization = %e\n", input_ionization->input_ionization[box_ct]);
-                                printf("\nN_b0 = %e\n", N_b0);
-                                printf("f_H = %e\n\n", f_H);
+                                printf("TsBox.c DEBUG:");
+                                printf("  dzp = %e\n", dzp);
+                                printf("  zp = %e\n", zp);
+                                printf("  dt_dzp = %e\n", dt_dzp);
+                                printf("  dadia_dzp * dzp = %e\n", dadia_dzp * dzp);
+                                printf("  dspec_dzp * dzp = %e\n", dspec_dzp * dzp);
+                                printf("  dcomp_dzp * dzp = %e\n", dcomp_dzp * dzp);
+                                printf("  dxheat_dzp * dzp = %e\n", dxheat_dzp * dzp);
+                                printf("  input heating = %e\n", input_heating->input_heating[box_ct]);
+                                printf("  dxion_source = %e\n", dt_dzp*dxion_source_dt_box[box_ct]*dzp);
+                                printf("  dxion_sink = %e\n", dt_dzp*dxion_sink_dt*dzp);
+                                printf("  T = %e\n", T);
+                                printf("  alpha_A(T) = %e\n", alpha_A(T));
+                                printf("  global_params.CLUMPING_FACTOR = %e\n", global_params.CLUMPING_FACTOR);
+                                printf("  x_e = %e\n", x_e);
+                                printf("  prefactor_1 = %e\n", prefactor_1);
+                                printf("  curr_delNL0 = %e\n", curr_delNL0);
+                                printf("  growth_factor_zp = %e\n", growth_factor_zp);
+                                printf("  input ionization = %e\n", input_ionization->input_ionization[box_ct]);
+                                printf("  N_b0 = %e\n", N_b0);
+                                printf("  f_H = %e\n", f_H);
                             }
                             // dadia_dzp = 0;
                             // YS DEBUG END
