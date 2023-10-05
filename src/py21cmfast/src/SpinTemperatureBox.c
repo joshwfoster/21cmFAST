@@ -1866,6 +1866,17 @@ LOG_SUPER_DEBUG("looping over box...");
                                                                     freq_int_lya_tbl[m_xHII_low_box[box_ct]][R_ct] ));
                             dstarlya_dt_box[box_ct] += (double)del_fcoll_Rct[box_ct]*dstarlya_dt_prefactor[R_ct];
 
+                            // if (box_ct == 0) {
+                            //     printf(" -x- zp = %e\n", zp);
+                            //     printf(" -x- R_ct = %d\n", R_ct);
+                            //     printf(" -x- dxheat_dt_box[box_ct] = %e\n", dxheat_dt_box[box_ct]);
+                            //     printf(" -x- dfcoll_dz_val = %e\n", dfcoll_dz_val);
+                            //     printf(" -x- del_fcoll_Rct[box_ct] = %e\n", del_fcoll_Rct[box_ct]);
+                            //     printf(" -x- (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct]) = %e\n", (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct]));
+                            //     printf(" -x- inverse_val_box[box_ct] = %e\n", inverse_val_box[box_ct]);
+                            //     printf(" -x- freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct] = %e\n", freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct]);
+                            // }
+
                             if (flag_options->USE_MINI_HALOS){
                                 dstarlyLW_dt_box[box_ct] += (double)del_fcoll_Rct[box_ct]*dstarlyLW_dt_prefactor[R_ct];
                             }
@@ -1965,26 +1976,52 @@ LOG_SUPER_DEBUG("looping over box...");
                             // YS DEBUG: print box_ct and dadia_dzp
                             if (box_ct == 0) {
                                 printf("TsBox.c DEBUG:");
-                                printf("  dzp = %e\n", dzp);
+                                // printf("  dzp = %e\n", dzp);
                                 printf("  zp = %e\n", zp);
-                                printf("  dt_dzp = %e\n", dt_dzp);
-                                printf("  dadia_dzp * dzp = %e\n", dadia_dzp * dzp);
-                                printf("  dspec_dzp * dzp = %e\n", dspec_dzp * dzp);
-                                printf("  dcomp_dzp * dzp = %e\n", dcomp_dzp * dzp);
-                                printf("  dxheat_dzp * dzp = %e\n", dxheat_dzp * dzp);
-                                printf("  input heating = %e\n", input_heating->input_heating[box_ct]);
-                                printf("  dxion_source = %e\n", dt_dzp*dxion_source_dt_box[box_ct]*dzp);
-                                printf("  dxion_sink = %e\n", dt_dzp*dxion_sink_dt*dzp);
-                                printf("  T = %e\n", T);
-                                printf("  alpha_A(T) = %e\n", alpha_A(T));
-                                printf("  global_params.CLUMPING_FACTOR = %e\n", global_params.CLUMPING_FACTOR);
-                                printf("  x_e = %e\n", x_e);
-                                printf("  prefactor_1 = %e\n", prefactor_1);
-                                printf("  curr_delNL0 = %e\n", curr_delNL0);
-                                printf("  growth_factor_zp = %e\n", growth_factor_zp);
-                                printf("  input ionization = %e\n", input_ionization->input_ionization[box_ct]);
-                                printf("  N_b0 = %e\n", N_b0);
-                                printf("  f_H = %e\n", f_H);
+                                // printf("  dt_dzp = %e\n", dt_dzp);
+                                // printf("  dadia_dzp * dzp = %e\n", dadia_dzp * dzp);
+                                // printf("  dspec_dzp * dzp = %e\n", dspec_dzp * dzp);
+                                // printf("  dcomp_dzp * dzp = %e\n", dcomp_dzp * dzp);
+                                // printf("  dxheat_dzp * dzp = %e\n", dxheat_dzp * dzp);
+                                // printf("  input heating = %e\n", input_heating->input_heating[box_ct]);
+                                // printf("  dxion_source = %e\n", dt_dzp*dxion_source_dt_box[box_ct]*dzp);
+                                // printf("  dxion_sink = %e\n", dt_dzp*dxion_sink_dt*dzp);
+                                // printf("  T = %e\n", T);
+                                // printf("  alpha_A(T) = %e\n", alpha_A(T));
+                                // printf("  global_params.CLUMPING_FACTOR = %e\n", global_params.CLUMPING_FACTOR);
+                                // printf("  x_e = %e\n", x_e);
+                                // printf("  prefactor_1 = %e\n", prefactor_1);
+                                // printf("  curr_delNL0 = %e\n", curr_delNL0);
+                                // printf("  growth_factor_zp = %e\n", growth_factor_zp);
+                                // printf("  input ionization = %e\n", input_ionization->input_ionization[box_ct]);
+                                // printf("  N_b0 = %e\n", N_b0);
+                                // printf("  f_H = %e\n", f_H);
+                                // printf("  input_jalpha = %e\n", input_jalpha->input_jalpha[box_ct]);
+                                // printf("  dxlya_dt_box = %e\n", dxlya_dt_box[box_ct]);
+                                // printf("  dstarlya_dt_box = %e\n", dstarlya_dt_box[box_ct]);
+                                // print dxheat_dt_box[box_ct]
+                                double eV_per_erg = 6.24150907e+11;
+                                double Hz_per_eV = NU_over_EV;
+                                double rydberg = 13.606; // [eV]
+                                double lya_eng = 0.75*rydberg; // [eV]
+                                double lya_eng_Hz = lya_eng * Hz_per_eV; // [Hz]
+                                double He_ion_eng = 24.587; // [eV]
+
+                                double E_heat = eV_per_erg * dxheat_dt_box[box_ct] * dt_dzp * dzp; // [eV/A]
+                                double E_ion = (f_H * rydberg + f_He * He_ion_eng) * dxion_source_dt_box[box_ct] * dt_dzp * dzp; // [eV/A]
+                                double J_prefac = C * N_b0 * pow(1+zp, 3) / (4*PI*lya_eng_Hz); // [pcm/s] * [A/pcm^3] / [sr Hz] = [A/(pcm^2 s sr Hz)]
+                                double E_lya = lya_eng * dxlya_dt_box[box_ct] / J_prefac; // [eV] * [1/(s Hz sr pcm^2)] / [A/(pcm^2 s sr Hz)] = [eV/A]
+                                double E_lya_star = lya_eng * dstarlya_dt_box[box_ct] / J_prefac; // [eV/A]
+                                double E_tot = E_heat + E_ion + E_lya;
+                                printf("  E_heat = %e eV/A\n", E_heat);
+                                printf("  E_ion = %e eV/A\n", E_ion);
+                                printf("  E_lya = %e\n eV/A\n", E_lya);
+                                printf("  E_lya_star = %e\n eV/A\n", E_lya_star);
+                                printf("  E_(tot=heat+ion+lya) = %e eV/A\n", E_tot);
+                                printf("  frac_heat = %e\n", E_heat / E_tot);
+                                printf("  frac_ion = %e\n", E_ion / E_tot);
+                                printf("  frac_lya = %e\n", E_lya / E_tot);
+                                printf("  (1.+curr_delNL0*growth_factor_zp) = %e\n", (1.+curr_delNL0*growth_factor_zp));
                             }
                             // dadia_dzp = 0;
                             // YS DEBUG END
