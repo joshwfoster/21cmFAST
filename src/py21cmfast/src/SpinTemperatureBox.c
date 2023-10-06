@@ -1999,7 +1999,6 @@ LOG_SUPER_DEBUG("looping over box...");
                                 // printf("  input_jalpha = %e\n", input_jalpha->input_jalpha[box_ct]);
                                 // printf("  dxlya_dt_box = %e\n", dxlya_dt_box[box_ct]);
                                 // printf("  dstarlya_dt_box = %e\n", dstarlya_dt_box[box_ct]);
-                                // print dxheat_dt_box[box_ct]
                                 double eV_per_erg = 6.24150907e+11;
                                 double Hz_per_eV = NU_over_EV;
                                 double rydberg = 13.606; // [eV]
