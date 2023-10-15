@@ -95,6 +95,8 @@ if (LOG_LEVEL >= DEBUG_LEVEL){
     double const_zp_prefactor, dt_dzp, x_e_ave, growth_factor_zp, dgrowth_factor_dzp, fcoll_R_for_reduction;
     double const_zp_prefactor_MINI;
 
+    double E_tot_ave = 0;
+
     int n_pts_radii;
     double trial_zpp_min,trial_zpp_max,trial_zpp, weight;
     bool first_radii, first_zero;
@@ -1848,7 +1850,7 @@ LOG_SUPER_DEBUG("looping over box...");
                             xc_fast,xi_power,xa_tilde_fast_arg,TS_fast,TSold_fast,xa_tilde_fast,dxheat_dzp_MINI,J_alpha_tot_MINI,curr_delNL0) \
                     num_threads(user_params->N_THREADS)
                 {
-#pragma omp for reduction(+:J_alpha_ave,xalpha_ave,Xheat_ave,Xion_ave,Ts_ave,Tk_ave,x_e_ave,J_alpha_ave_MINI,Xheat_ave_MINI,J_LW_ave,J_LW_ave_MINI)
+#pragma omp for reduction(+:E_tot_ave,J_alpha_ave,xalpha_ave,Xheat_ave,Xion_ave,Ts_ave,Tk_ave,x_e_ave,J_alpha_ave_MINI,Xheat_ave_MINI,J_LW_ave,J_LW_ave_MINI)
                     for (box_ct=0; box_ct<HII_TOT_NUM_PIXELS; box_ct++){
 
                         // I've added the addition of zero just in case. It should be zero anyway, but just in case there is some weird
@@ -1937,6 +1939,30 @@ LOG_SUPER_DEBUG("looping over box...");
                                 dstarlyLW_dt_box_MINI[box_ct] *= prefactor_2_MINI * (hplank * 1e21);
                             }
 
+                            // BEGIN YS DEBUG
+                            double eV_per_erg = 6.24150907e+11;
+                            double Hz_per_eV = NU_over_EV;
+                            double rydberg = 13.606; // [eV]
+                            double lya_eng = 0.75*rydberg; // [eV]
+                            double lya_eng_Hz = lya_eng * Hz_per_eV; // [Hz]
+                            double He_ion_eng = 24.587; // [eV]
+                            double hubble_at_zp = - 1 / ((1+zp) * dt_dzp); // [s^-1] <- I think dt is in [s] but this will cancel
+
+                            double E_heat = eV_per_erg * dxheat_dt_box[box_ct] * dt_dzp * dzp; // [eV/A]
+                            double E_ion = (f_H * rydberg + f_He * He_ion_eng) * dxion_source_dt_box[box_ct] * dt_dzp * dzp; // [eV/A]
+                            double J_prefac = C * N_b0 * pow(1+zp, 3) / (4*PI * lya_eng_Hz * hubble_at_zp); // [pcm/s] * [A/pcm^3] / [sr Hz s^-1] = [A/(pcm^2 sr Hz)]
+                            double E_lya = lya_eng * dxlya_dt_box[box_ct] * dt_dzp * dzp / J_prefac; // [eV] * [1/(s Hz sr pcm^2)] * [s] / [A/(pcm^2 sr Hz)] = [eV/A]
+                            double E_lya_star = lya_eng * dstarlya_dt_box[box_ct] * dt_dzp * dzp / J_prefac; // [eV/A]
+                            double E_tot = E_heat + E_ion + E_lya;
+                            E_tot_ave += E_tot;
+
+                            // BEGIN even split f
+                            dxheat_dt_box[box_ct] = (E_tot / 3) / (eV_per_erg * dt_dzp * dzp);
+                            dxion_source_dt_box[box_ct] = (E_tot / 3) / ((f_H * rydberg + f_He * He_ion_eng) * dt_dzp * dzp);
+                            dxlya_dt_box[box_ct] = (E_tot / 3) / (lya_eng * dt_dzp * dzp / J_prefac);
+                            // END even split f
+                            // END YS DEBUG
+
                             // Now we can solve the evolution equations  //
 
                             // First let's do dxe_dzp //
@@ -1958,7 +1984,8 @@ LOG_SUPER_DEBUG("looping over box...");
                             dadia_dzp *= (2.0/3.0)*T;
 
                             // next heating due to the changing species
-                            // dspec_dzp = - dxe_dzp * T / (1+x_e);
+                            dspec_dzp = - dxe_dzp * T / (1+x_e);
+                            dspec_dzp = 0;
                             if (box_ct == 0) {
                                 printf("This is commented out: dspec_dzp = - dxe_dzp * T / (1+x_e); need to put it back in\n");
                             }
@@ -1973,7 +2000,7 @@ LOG_SUPER_DEBUG("looping over box...");
                                 dxheat_dzp_MINI = dxheat_dt_box_MINI[box_ct] * dt_dzp * 2.0 / 3.0 / k_B / (1.0+x_e);
                             }
 
-                            // YS DEBUG: print box_ct and dadia_dzp
+                            // BEGIN YS DEBUG: print box_ct and dadia_dzp
                             if (box_ct == 0) {
                                 printf("TsBox.c DEBUG:");
                                 // printf("  dzp = %e\n", dzp);
@@ -1999,23 +2026,10 @@ LOG_SUPER_DEBUG("looping over box...");
                                 // printf("  input_jalpha = %e\n", input_jalpha->input_jalpha[box_ct]);
                                 // printf("  dxlya_dt_box = %e\n", dxlya_dt_box[box_ct]);
                                 // printf("  dstarlya_dt_box = %e\n", dstarlya_dt_box[box_ct]);
-                                double eV_per_erg = 6.24150907e+11;
-                                double Hz_per_eV = NU_over_EV;
-                                double rydberg = 13.606; // [eV]
-                                double lya_eng = 0.75*rydberg; // [eV]
-                                double lya_eng_Hz = lya_eng * Hz_per_eV; // [Hz]
-                                double He_ion_eng = 24.587; // [eV]
-
-                                double E_heat = eV_per_erg * dxheat_dt_box[box_ct] * dt_dzp * dzp; // [eV/A]
-                                double E_ion = (f_H * rydberg + f_He * He_ion_eng) * dxion_source_dt_box[box_ct] * dt_dzp * dzp; // [eV/A]
-                                double J_prefac = C * N_b0 * pow(1+zp, 3) / (4*PI*lya_eng_Hz); // [pcm/s] * [A/pcm^3] / [sr Hz] = [A/(pcm^2 s sr Hz)]
-                                double E_lya = lya_eng * dxlya_dt_box[box_ct] / J_prefac; // [eV] * [1/(s Hz sr pcm^2)] / [A/(pcm^2 s sr Hz)] = [eV/A]
-                                double E_lya_star = lya_eng * dstarlya_dt_box[box_ct] / J_prefac; // [eV/A]
-                                double E_tot = E_heat + E_ion + E_lya;
                                 printf("  E_heat = %e eV/A\n", E_heat);
                                 printf("  E_ion = %e eV/A\n", E_ion);
-                                printf("  E_lya = %e\n eV/A\n", E_lya);
-                                printf("  E_lya_star = %e\n eV/A\n", E_lya_star);
+                                printf("  E_lya = %e eV/A\n", E_lya);
+                                printf("  E_lya_star = %e eV/A\n", E_lya_star);
                                 printf("  E_(tot=heat+ion+lya) = %e eV/A\n", E_tot);
                                 printf("  frac_heat = %e\n", E_heat / E_tot);
                                 printf("  frac_ion = %e\n", E_ion / E_tot);
@@ -2023,7 +2037,7 @@ LOG_SUPER_DEBUG("looping over box...");
                                 printf("  (1.+curr_delNL0*growth_factor_zp) = %e\n", (1.+curr_delNL0*growth_factor_zp));
                             }
                             // dadia_dzp = 0;
-                            // YS DEBUG END
+                            // END YS DEBUG
 
                             //update quantities
                             x_e += ( dxe_dzp ) * dzp + input_ionization->input_ionization[box_ct]; // remember dzp is negative
@@ -2314,6 +2328,9 @@ LOG_SUPER_DEBUG("finished loop");
 
         /////////////////////////////  END LOOP ////////////////////////////////////////////
         // compute new average values
+        E_tot_ave /= (double)HII_TOT_NUM_PIXELS;
+        printf("zp = %e E_tot_ave = %e\n", zp, E_tot_ave);
+
         if(LOG_LEVEL >= DEBUG_LEVEL){
             x_e_ave /= (double)HII_TOT_NUM_PIXELS;
 
