@@ -1224,7 +1224,7 @@ double nu_tau_one_MINI(double zp, double zpp, double x_e, double HI_filling_fact
 double nu_tau_one(double zp, double zpp, double x_e, double HI_filling_factor_zp){
 
     // DEBUG: turning off attenuation
-    return 0.0;
+    // return 0.0;
 
     int status, iter, max_iter;
     const gsl_root_fsolver_type * T;

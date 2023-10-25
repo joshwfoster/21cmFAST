@@ -1195,6 +1195,8 @@ LOG_SUPER_DEBUG("beginning loop over R_ct");
                 else{
                     lower_int_limit = fmax(nu_tau_one(zp, zpp, x_e_ave, filling_factor_of_HI_zp), (astro_params->NU_X_THRESH)*NU_over_EV);
                 }
+                // YS DEBUG
+                //printf("lower_int_limit = %e\n", lower_int_limit);
 
                 if (filling_factor_of_HI_zp < 0) filling_factor_of_HI_zp = 0; // for global evol; nu_tau_one above treats negative (post_reionization) inferred filling factors properly
 
@@ -1868,17 +1870,6 @@ LOG_SUPER_DEBUG("looping over box...");
                                                                     freq_int_lya_tbl[m_xHII_low_box[box_ct]][R_ct] ));
                             dstarlya_dt_box[box_ct] += (double)del_fcoll_Rct[box_ct]*dstarlya_dt_prefactor[R_ct];
 
-                            // if (box_ct == 0) {
-                            //     printf(" -x- zp = %e\n", zp);
-                            //     printf(" -x- R_ct = %d\n", R_ct);
-                            //     printf(" -x- dxheat_dt_box[box_ct] = %e\n", dxheat_dt_box[box_ct]);
-                            //     printf(" -x- dfcoll_dz_val = %e\n", dfcoll_dz_val);
-                            //     printf(" -x- del_fcoll_Rct[box_ct] = %e\n", del_fcoll_Rct[box_ct]);
-                            //     printf(" -x- (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct]) = %e\n", (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct]));
-                            //     printf(" -x- inverse_val_box[box_ct] = %e\n", inverse_val_box[box_ct]);
-                            //     printf(" -x- freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct] = %e\n", freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct]);
-                            // }
-
                             if (flag_options->USE_MINI_HALOS){
                                 dstarlyLW_dt_box[box_ct] += (double)del_fcoll_Rct[box_ct]*dstarlyLW_dt_prefactor[R_ct];
                             }
@@ -1957,9 +1948,9 @@ LOG_SUPER_DEBUG("looping over box...");
                             E_tot_ave += E_tot;
 
                             // BEGIN even split f
-                            dxheat_dt_box[box_ct] = (E_tot / 3) / (eV_per_erg * dt_dzp * dzp);
-                            dxion_source_dt_box[box_ct] = (E_tot / 3) / ((f_H * rydberg + f_He * He_ion_eng) * dt_dzp * dzp);
-                            dxlya_dt_box[box_ct] = (E_tot / 3) / (lya_eng * dt_dzp * dzp / J_prefac);
+                            // dxheat_dt_box[box_ct] = (E_tot / 3) / (eV_per_erg * dt_dzp * dzp);
+                            // dxion_source_dt_box[box_ct] = (E_tot / 3) / ((f_H * rydberg + f_He * He_ion_eng) * dt_dzp * dzp);
+                            // dxlya_dt_box[box_ct] = (E_tot / 3) / (lya_eng * dt_dzp * dzp / J_prefac);
                             // END even split f
                             // END YS DEBUG
 
@@ -1985,10 +1976,10 @@ LOG_SUPER_DEBUG("looping over box...");
 
                             // next heating due to the changing species
                             dspec_dzp = - dxe_dzp * T / (1+x_e);
-                            dspec_dzp = 0;
-                            if (box_ct == 0) {
-                                printf("This is commented out: dspec_dzp = - dxe_dzp * T / (1+x_e); need to put it back in\n");
-                            }
+                            // dspec_dzp = 0;
+                            // if (box_ct == 0) {
+                            //     printf("This is commented out: dspec_dzp = - dxe_dzp * T / (1+x_e); need to put it back in\n");
+                            // }
 
                             // next, Compton heating
                             //                dcomp_dzp = dT_comp(zp, T, x_e);
@@ -2002,9 +1993,9 @@ LOG_SUPER_DEBUG("looping over box...");
 
                             // BEGIN YS DEBUG: print box_ct and dadia_dzp
                             if (box_ct == 0) {
-                                printf("TsBox.c DEBUG:");
+                                // printf("TsBox.c DEBUG:");
                                 // printf("  dzp = %e\n", dzp);
-                                printf("  zp = %e\n", zp);
+                                // printf("  zp = %e\n", zp);
                                 // printf("  dt_dzp = %e\n", dt_dzp);
                                 // printf("  dadia_dzp * dzp = %e\n", dadia_dzp * dzp);
                                 // printf("  dspec_dzp * dzp = %e\n", dspec_dzp * dzp);
@@ -2026,15 +2017,15 @@ LOG_SUPER_DEBUG("looping over box...");
                                 // printf("  input_jalpha = %e\n", input_jalpha->input_jalpha[box_ct]);
                                 // printf("  dxlya_dt_box = %e\n", dxlya_dt_box[box_ct]);
                                 // printf("  dstarlya_dt_box = %e\n", dstarlya_dt_box[box_ct]);
-                                printf("  E_heat = %e eV/A\n", E_heat);
-                                printf("  E_ion = %e eV/A\n", E_ion);
-                                printf("  E_lya = %e eV/A\n", E_lya);
-                                printf("  E_lya_star = %e eV/A\n", E_lya_star);
-                                printf("  E_(tot=heat+ion+lya) = %e eV/A\n", E_tot);
-                                printf("  frac_heat = %e\n", E_heat / E_tot);
-                                printf("  frac_ion = %e\n", E_ion / E_tot);
-                                printf("  frac_lya = %e\n", E_lya / E_tot);
-                                printf("  (1.+curr_delNL0*growth_factor_zp) = %e\n", (1.+curr_delNL0*growth_factor_zp));
+                                // printf("  E_heat = %e eV/A\n", E_heat);
+                                // printf("  E_ion = %e eV/A\n", E_ion);
+                                // printf("  E_lya = %e eV/A\n", E_lya);
+                                // printf("  E_lya_star = %e eV/A\n", E_lya_star);
+                                // printf("  E_(tot=heat+ion+lya) = %e eV/A\n", E_tot);
+                                // printf("  frac_heat = %e\n", E_heat / E_tot);
+                                // printf("  frac_ion = %e\n", E_ion / E_tot);
+                                // printf("  frac_lya = %e\n", E_lya / E_tot);
+                                // printf("  (1.+curr_delNL0*growth_factor_zp) = %e\n", (1.+curr_delNL0*growth_factor_zp));
                             }
                             // dadia_dzp = 0;
                             // END YS DEBUG
@@ -2329,7 +2320,7 @@ LOG_SUPER_DEBUG("finished loop");
         /////////////////////////////  END LOOP ////////////////////////////////////////////
         // compute new average values
         E_tot_ave /= (double)HII_TOT_NUM_PIXELS;
-        printf("zp = %e E_tot_ave = %e\n", zp, E_tot_ave);
+        //printf("zp = %e E_tot_ave = %e\n", zp, E_tot_ave);
 
         if(LOG_LEVEL >= DEBUG_LEVEL){
             x_e_ave /= (double)HII_TOT_NUM_PIXELS;
