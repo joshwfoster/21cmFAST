@@ -1786,14 +1786,74 @@ LOG_SUPER_DEBUG("looping over box...");
                                                            curr_dens,pow(10,log10_Mcrit_LW[R_ct][box_ct]),Mcrit_atom_interp_table[R_ct],\
                                                            astro_params->ALPHA_STAR_MINI,0.,astro_params->F_STAR7_MINI,1.,Mlim_Fstar_MINI, 0., user_params->FAST_FCOLL_TABLES);
                                     fcoll_MINI *= pow(10.,10.);
-
                                 }
                                 else {
                                     fcoll = Nion_ConditionalM(zpp_growth[R_ct],log(M_MIN),log(Mmax),sigmaMmax,Deltac,curr_dens,astro_params->M_TURN,
                                                               astro_params->ALPHA_STAR,0.,astro_params->F_STAR10,1.,Mlim_Fstar,0., user_params->FAST_FCOLL_TABLES);
+                                    // BEGIN YS DEBUG
+                                    // if (box_ct == 0) {
+                                    //     printf("fcoll=%e, R_ct=%d, zpp_growth[R_ct]=%e, log(M_MIN)=%e, log(Mmax)=%e, sigmaMmax=%e, Deltac=%e, curr_dens=%e, astro_params->M_TURN=%e, astro_params->ALPHA_STAR=%e, astro_params->F_STAR10=%e, Mlim_Fstar=%e, user_params->FAST_FCOLL_TABLES=%d\n",
+                                    //             fcoll,    R_ct,    zpp_growth[R_ct],    log(M_MIN),    log(Mmax),    sigmaMmax,    Deltac,    curr_dens,    astro_params->M_TURN,    astro_params->ALPHA_STAR,    astro_params->F_STAR10,    Mlim_Fstar,    user_params->FAST_FCOLL_TABLES);
+                                    //     fflush(stdout);
+                                    // }
+                                    // END YS DEBUG
                                 }
                                 fcoll *= pow(10.,10.);
                             }
+
+                            //========== BEGIN YS DEBUG ==========
+                            // we are changing the fcoll(delta) to something simple that we understand
+                            // if (box_ct==0) {
+                            //     // print current density and z
+                            //     printf("R_ct=%d, curr_dens=%e, zp=%e, R=%e\n", R_ct, curr_dens, zp, R_values[R_ct]);
+                            //     fcoll = 1.;
+                            // }
+                            //===== R term =====
+                            // double sfrd_R, sfrd_d, sfrd_z;
+                            // double sfrd_R_term, sfrd_d_term, sfrd_z_term;
+                            // sfrd_R = log10f(R_values[R_ct]);
+                            // if (sfrd_R < 0.1 || sfrd_R > 512.) {
+                            //     sfrd_R_term = 0.;
+                            // }
+                            // else {
+                            //     sfrd_R_term = - 4.90681604e-10 * pow(sfrd_R, 6) \
+                            //                 + 6.03851957e-09 * pow(sfrd_R, 5) \
+                            //                 - 1.61836168e-08 * pow(sfrd_R, 4) \
+                            //                 - 7.21151847e-09 * pow(sfrd_R, 3) \
+                            //                 + 4.31479336e-08 * pow(sfrd_R, 2) \
+                            //                 + 4.26751313e-08 * pow(sfrd_R, 1) \
+                            //                 + 1.31003189e-08;
+                            //     sfrd_R_term *= 1e7;
+                            // }
+                            // //===== d term =====
+                            // sfrd_d = curr_dens;
+                            // if (sfrd_d < -1. || sfrd_d > 1.66) {
+                            //     sfrd_d_term = 0.;
+                            // }
+                            // else {
+                            //     sfrd_d_term = 3.58160894 * sfrd_d - 1.75674659;
+                            //     sfrd_d_term = exp(sfrd_d_term * log(10.0f));
+                            // }
+                            // //===== z term =====
+                            // sfrd_z = log10f(zp);
+                            // if (sfrd_z < 5. || sfrd_z > 50.) {
+                            //     sfrd_z_term = 0.;
+                            // }
+                            // else {
+                            //     sfrd_z_term = - 2.67086153 * pow(sfrd_z, 3) \
+                            //                 + 6.54275943 * pow(sfrd_z, 2) \
+                            //                 + 5.86166611 * pow(sfrd_z, 1) \
+                            //                 + 13.06866749;
+                            //     sfrd_z_term = exp(sfrd_z_term * log(10.0f));
+                            // }
+                            //===== product =====
+                            //fcoll = sfrd_R_term * sfrd_d_term * sfrd_z_term;
+                            
+                            // if (box_ct==0) {
+                            //     printf("fcoll=%e\n", fcoll);
+                            // }
+                            fcoll = (1.+curr_dens);
+                            //========== END YS DEBUG ==========
 
                             ave_fcoll += fcoll;
 
@@ -1902,6 +1962,20 @@ LOG_SUPER_DEBUG("looping over box...");
                             }
                         }
 
+                        // BEGIN YS DEBUG
+                        // if (zp < 15) {
+                        //     if (box_ct == 0) {
+                        //         curr_dens = delNL0[R_ct][box_ct]*zpp_growth[R_ct];
+                        //         fcoll = Nion_ConditionalM(zpp_growth[R_ct],log(M_MIN),log(Mmax),sigmaMmax,Deltac,curr_dens,astro_params->M_TURN,
+                        //                 astro_params->ALPHA_STAR,0.,astro_params->F_STAR10,1.,Mlim_Fstar,0., user_params->FAST_FCOLL_TABLES);
+                        //         printf("zp=%e\n", zp);
+                        //         printf("fcoll=%e, R_ct=%d, zpp_growth[R_ct]=%e, log(M_MIN)=%e, log(Mmax)=%e, sigmaMmax=%e, Deltac=%e, curr_dens=%e, astro_params->M_TURN=%e, astro_params->ALPHA_STAR=%e, astro_params->F_STAR10=%e, Mlim_Fstar=%e, user_params->FAST_FCOLL_TABLES=%d\n",
+                        //                 fcoll,    R_ct,    zpp_growth[R_ct],    log(M_MIN),    log(Mmax),    sigmaMmax,    Deltac,    curr_dens,    astro_params->M_TURN,    astro_params->ALPHA_STAR,    astro_params->F_STAR10,    Mlim_Fstar,    user_params->FAST_FCOLL_TABLES);
+                        //         fflush(stdout);
+                        //     }
+                        // }
+                        // END YS DEBUG
+
                         // If R_ct == 0, as this is the final smoothing scale (i.e. it is reversed)
                         if(R_ct==0) {
 
@@ -1993,6 +2067,8 @@ LOG_SUPER_DEBUG("looping over box...");
 
                             // BEGIN YS DEBUG: print box_ct and dadia_dzp
                             if (box_ct == 0) {
+                                // printf("hello eom");
+                                // fflush(stdout);
                                 // printf("TsBox.c DEBUG:");
                                 // printf("  dzp = %e\n", dzp);
                                 // printf("  zp = %e\n", zp);
