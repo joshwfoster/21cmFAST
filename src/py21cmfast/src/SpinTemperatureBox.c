@@ -1852,12 +1852,14 @@ LOG_SUPER_DEBUG("looping over box...");
                             // if (box_ct==0) {
                             //     printf("fcoll=%e\n", fcoll);
                             // }
-                            fcoll = (1.+curr_dens);
+                            fcoll = (1.+curr_dens); // / growth_factor_z * zpp_growth[R_ct];
+                            //fcoll = 1.;
                             //========== END YS DEBUG ==========
 
                             ave_fcoll += fcoll;
 
-                            del_fcoll_Rct[box_ct] = (1.+curr_dens)*fcoll;
+                            //del_fcoll_Rct[box_ct] = (1.+curr_dens)*fcoll;
+                            del_fcoll_Rct[box_ct] = fcoll;
 
                             if (flag_options->USE_MINI_HALOS){
                                 ave_fcoll_MINI += fcoll_MINI;
@@ -1918,17 +1920,20 @@ LOG_SUPER_DEBUG("looping over box...");
                         // I've added the addition of zero just in case. It should be zero anyway, but just in case there is some weird
                         // numerical thing
                         if(ave_fcoll!=0.) {
-                            dxheat_dt_box[box_ct] += (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
+                            // BEGIN YS DEBUG
+                            double debug_multiplier = 100.;
+                            dxheat_dt_box[box_ct] += debug_multiplier * (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
                                                     (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct])*inverse_val_box[box_ct] + \
                                                                     freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct] ));
-                            dxion_source_dt_box[box_ct] += (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
+                            dxion_source_dt_box[box_ct] += debug_multiplier * (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
                                                     (freq_int_ion_tbl_diff[m_xHII_low_box[box_ct]][R_ct])*inverse_val_box[box_ct] + \
                                                                     freq_int_ion_tbl[m_xHII_low_box[box_ct]][R_ct] ));
 
-                            dxlya_dt_box[box_ct] += (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
+                            dxlya_dt_box[box_ct] += debug_multiplier * (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
                                                     (freq_int_lya_tbl_diff[m_xHII_low_box[box_ct]][R_ct])*inverse_val_box[box_ct] + \
                                                                     freq_int_lya_tbl[m_xHII_low_box[box_ct]][R_ct] ));
-                            dstarlya_dt_box[box_ct] += (double)del_fcoll_Rct[box_ct]*dstarlya_dt_prefactor[R_ct];
+                            dstarlya_dt_box[box_ct] += debug_multiplier * (double)del_fcoll_Rct[box_ct]*dstarlya_dt_prefactor[R_ct];
+                            // END YS DEBUG
 
                             if (flag_options->USE_MINI_HALOS){
                                 dstarlyLW_dt_box[box_ct] += (double)del_fcoll_Rct[box_ct]*dstarlyLW_dt_prefactor[R_ct];
