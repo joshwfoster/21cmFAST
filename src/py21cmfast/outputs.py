@@ -410,6 +410,7 @@ class TsBox(_AllParamsBox):
             "x_e_box": shape,
             "Tk_box": shape,
             "J_21_LW_box": shape,
+            "SmoothedDelta": (40,)+shape,
         }
 
     @cached_property
@@ -457,6 +458,7 @@ class TsBox(_AllParamsBox):
             required += [
                 "Tk_box",
                 "x_e_box",
+                "SmoothedDelta",
             ]
             if self.flag_options.USE_MINI_HALOS:
                 required += ["J_21_LW_box"]
