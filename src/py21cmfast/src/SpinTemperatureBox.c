@@ -1922,6 +1922,16 @@ LOG_SUPER_DEBUG("looping over box...");
                         if(ave_fcoll!=0.) {
                             // BEGIN YS DEBUG
                             double debug_multiplier = 100.;
+
+                            // Begin Josh Insertion
+                            x_e = previous_spin_temp->x_e_box[box_ct];
+                            this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] = debug_multiplier*(dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
+                                                                                              (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct])*inverse_val_box[box_ct] + \
+                                                                                               freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct] ));
+                            this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= const_zp_prefactor;
+                            this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= dt_dzp * 2.0 / 3.0 / k_B / (1.0+x_e)*dzp;
+                            // End Josh Insertion
+              
                             dxheat_dt_box[box_ct] += debug_multiplier * (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
                                                     (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct])*inverse_val_box[box_ct] + \
                                                                     freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct] ));
