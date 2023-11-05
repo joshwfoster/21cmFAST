@@ -120,6 +120,7 @@ struct TsBox{
     float *x_e_box;
     float *Tk_box;
     float *J_21_LW_box;
+    float *SmoothedDelta;
 };
 
 struct IonizedBox{
