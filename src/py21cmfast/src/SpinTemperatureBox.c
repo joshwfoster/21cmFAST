@@ -1854,12 +1854,12 @@ LOG_SUPER_DEBUG("looping over box...");
                             // }
                             fcoll = (1.+curr_dens); // / growth_factor_z * zpp_growth[R_ct];
                             //fcoll = 1.;
-                            //========== END YS DEBUG ==========
 
                             ave_fcoll += fcoll;
 
                             //del_fcoll_Rct[box_ct] = (1.+curr_dens)*fcoll;
                             del_fcoll_Rct[box_ct] = fcoll;
+                            //========== END YS DEBUG ==========
 
                             if (flag_options->USE_MINI_HALOS){
                                 ave_fcoll_MINI += fcoll_MINI;
@@ -1921,7 +1921,7 @@ LOG_SUPER_DEBUG("looping over box...");
                         // numerical thing
                         if(ave_fcoll!=0.) {
                             // BEGIN YS DEBUG
-                            double debug_multiplier = 100.;
+                            double debug_multiplier = 10.;
 
                             // Begin Josh Insertion
                             // x_e = previous_spin_temp->x_e_box[box_ct];
@@ -1935,6 +1935,7 @@ LOG_SUPER_DEBUG("looping over box...");
                                                                                                 freq_int_ion_tbl[m_xHII_low_box[box_ct]][R_ct] ));
                             this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= const_zp_prefactor;
                             this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= dt_dzp * dzp;
+                            // this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] = 1.;
                             // End Josh Insertion
               
                             dxheat_dt_box[box_ct] += debug_multiplier * (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
@@ -2041,11 +2042,11 @@ LOG_SUPER_DEBUG("looping over box...");
                             double E_tot = E_heat + E_ion + E_lya;
                             E_tot_ave += E_tot;
 
-                            // BEGIN even split f
-                            // dxheat_dt_box[box_ct] = (E_tot / 3) / (eV_per_erg * dt_dzp * dzp);
-                            // dxion_source_dt_box[box_ct] = (E_tot / 3) / ((f_H * rydberg + f_He * He_ion_eng) * dt_dzp * dzp);
-                            // dxlya_dt_box[box_ct] = (E_tot / 3) / (lya_eng * dt_dzp * dzp / J_prefac);
-                            // END even split f
+                            // BEGIN tweaking f
+                            dxheat_dt_box[box_ct] = (E_tot * 0. / 3.) / (eV_per_erg * dt_dzp * dzp);
+                            dxion_source_dt_box[box_ct] = (E_tot * 3. / 3.) / ((f_H * rydberg + f_He * He_ion_eng) * dt_dzp * dzp);
+                            dxlya_dt_box[box_ct] = (E_tot * 0. / 3.) / (lya_eng * dt_dzp * dzp / J_prefac);
+                            // END tweaking f
                             // END YS DEBUG
 
                             // Now we can solve the evolution equations  //
@@ -2053,6 +2054,9 @@ LOG_SUPER_DEBUG("looping over box...");
                             // First let's do dxe_dzp //
                             dxion_sink_dt = alpha_A(T) * global_params.CLUMPING_FACTOR * x_e*x_e * f_H * prefactor_1 * \
                                             (1.+curr_delNL0*growth_factor_zp);
+                            // BEGIN YS DEBUG
+                            dxion_sink_dt = 0.;
+                            // END YS DEBUG
                             if (flag_options->USE_MINI_HALOS){
                                 dxe_dzp = dt_dzp*(dxion_source_dt_box[box_ct] + dxion_source_dt_box_MINI[box_ct] - dxion_sink_dt );
                             }
@@ -2416,7 +2420,7 @@ LOG_SUPER_DEBUG("finished loop");
         /////////////////////////////  END LOOP ////////////////////////////////////////////
         // compute new average values
         E_tot_ave /= (double)HII_TOT_NUM_PIXELS;
-        //printf("zp = %e E_tot_ave = %e\n", zp, E_tot_ave);
+        printf("zp = %e E_tot_ave = %e\n", zp, E_tot_ave);
 
         if(LOG_LEVEL >= DEBUG_LEVEL){
             x_e_ave /= (double)HII_TOT_NUM_PIXELS;
