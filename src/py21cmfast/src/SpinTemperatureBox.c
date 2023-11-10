@@ -1924,20 +1924,22 @@ LOG_SUPER_DEBUG("looping over box...");
                             double debug_multiplier = 10.;
 
                             // Begin Josh Insertion
-                            // x_e = previous_spin_temp->x_e_box[box_ct];
-                            // this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] = debug_multiplier*(dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
-                            //                                                                   (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct])*inverse_val_box[box_ct] + \
-                            //                                                                    freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct] ));
-                            // this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= const_zp_prefactor;
-                            // this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= dt_dzp * 2.0 / 3.0 / k_B / (1.0+x_e)*dzp;
-                            this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] = debug_multiplier * (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
+                            x_e = previous_spin_temp->x_e_box[box_ct];
+                            this_spin_temp->DepHeatBox[R_ct*HII_TOT_NUM_PIXELS + box_ct] = debug_multiplier*(dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
+                                                                                              (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct])*inverse_val_box[box_ct] + \
+                                                                                               freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct] ));
+                            this_spin_temp->DepHeatBox[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= const_zp_prefactor;
+                            this_spin_temp->DepHeatBox[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= dt_dzp * 2.0 / 3.0 / k_B / (1.0+x_e)*dzp;
+
+                            this_spin_temp->DepIonBox[R_ct*HII_TOT_NUM_PIXELS + box_ct] = debug_multiplier * (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
                                                                                                 (freq_int_ion_tbl_diff[m_xHII_low_box[box_ct]][R_ct])*inverse_val_box[box_ct] + \
                                                                                                 freq_int_ion_tbl[m_xHII_low_box[box_ct]][R_ct] ));
-                            this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= const_zp_prefactor;
-                            this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= dt_dzp * dzp;
-                            // this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] = 1.;
+                            this_spin_temp->DepIonBox[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= const_zp_prefactor;
+                            this_spin_temp->DepIonBox[R_ct*HII_TOT_NUM_PIXELS + box_ct] *= dt_dzp * dzp;
+
+                            this_spin_temp->SmoothedDelta[R_ct*HII_TOT_NUM_PIXELS + box_ct] = del_fcoll_Rct[box_ct] - 1.;
+
                             // End Josh Insertion
-              
                             dxheat_dt_box[box_ct] += debug_multiplier * (dfcoll_dz_val*(double)del_fcoll_Rct[box_ct]*( \
                                                     (freq_int_heat_tbl_diff[m_xHII_low_box[box_ct]][R_ct])*inverse_val_box[box_ct] + \
                                                                     freq_int_heat_tbl[m_xHII_low_box[box_ct]][R_ct] ));
@@ -2043,9 +2045,9 @@ LOG_SUPER_DEBUG("looping over box...");
                             E_tot_ave += E_tot;
 
                             // BEGIN tweaking f
-                            dxheat_dt_box[box_ct] = (E_tot * 0. / 3.) / (eV_per_erg * dt_dzp * dzp);
-                            dxion_source_dt_box[box_ct] = (E_tot * 3. / 3.) / ((f_H * rydberg + f_He * He_ion_eng) * dt_dzp * dzp);
-                            dxlya_dt_box[box_ct] = (E_tot * 0. / 3.) / (lya_eng * dt_dzp * dzp / J_prefac);
+                            // dxheat_dt_box[box_ct] = (E_tot * 0. / 3.) / (eV_per_erg * dt_dzp * dzp);
+                            // dxion_source_dt_box[box_ct] = (E_tot * 3. / 3.) / ((f_H * rydberg + f_He * He_ion_eng) * dt_dzp * dzp);
+                            // dxlya_dt_box[box_ct] = (E_tot * 0. / 3.) / (lya_eng * dt_dzp * dzp / J_prefac);
                             // END tweaking f
                             // END YS DEBUG
 
@@ -2058,6 +2060,7 @@ LOG_SUPER_DEBUG("looping over box...");
                             dxion_sink_dt = 0.;
                             // END YS DEBUG
                             if (flag_options->USE_MINI_HALOS){
+                                printf("This shouldn't print");
                                 dxe_dzp = dt_dzp*(dxion_source_dt_box[box_ct] + dxion_source_dt_box_MINI[box_ct] - dxion_sink_dt );
                             }
                             else{
