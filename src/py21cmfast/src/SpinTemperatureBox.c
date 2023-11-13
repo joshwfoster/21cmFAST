@@ -1921,7 +1921,7 @@ LOG_SUPER_DEBUG("looping over box...");
                         // numerical thing
                         if(ave_fcoll!=0.) {
                             // BEGIN YS DEBUG
-                            double debug_multiplier = 10.;
+                            double debug_multiplier = 1.;
 
                             // Begin Josh Insertion
                             x_e = previous_spin_temp->x_e_box[box_ct];
@@ -2057,7 +2057,7 @@ LOG_SUPER_DEBUG("looping over box...");
                             dxion_sink_dt = alpha_A(T) * global_params.CLUMPING_FACTOR * x_e*x_e * f_H * prefactor_1 * \
                                             (1.+curr_delNL0*growth_factor_zp);
                             // BEGIN YS DEBUG
-                            dxion_sink_dt = 0.;
+                            // dxion_sink_dt = 0.;
                             // END YS DEBUG
                             if (flag_options->USE_MINI_HALOS){
                                 printf("This shouldn't print");
@@ -2423,7 +2423,7 @@ LOG_SUPER_DEBUG("finished loop");
         /////////////////////////////  END LOOP ////////////////////////////////////////////
         // compute new average values
         E_tot_ave /= (double)HII_TOT_NUM_PIXELS;
-        printf("zp = %e E_tot_ave = %e\n", zp, E_tot_ave);
+        //printf("zp = %e E_tot_ave = %e\n", zp, E_tot_ave);
 
         if(LOG_LEVEL >= DEBUG_LEVEL){
             x_e_ave /= (double)HII_TOT_NUM_PIXELS;
