@@ -60,6 +60,7 @@ struct AstroParams{
     double BETA_LW;
     double A_VCB;
     double BETA_VCB;
+    double DM;
 
     float t_STAR;
 
