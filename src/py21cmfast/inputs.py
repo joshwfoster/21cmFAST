@@ -472,7 +472,7 @@ class UserParams(StructWithDefaults):
         "PERTURB_ON_HIGH_RES": False,
         "NO_RNG": False,
         "USE_INTERPOLATION_TABLES": None,
-        "FAST_FCOLL_TABLES": False,
+        "FAST_FCOLL_TABLES": True,
         "USE_2LPT": True,
         "MINIMIZE_MEMORY": False,
     }
@@ -827,7 +827,7 @@ class AstroParams(StructWithDefaults):
         "BETA_LW": 0.6,
         "A_VCB": 1.0,
         "BETA_VCB": 1.8,
-        "DM": 1,
+        "DM": 0,
     }
 
     def __init__(
