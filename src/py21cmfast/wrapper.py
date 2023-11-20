@@ -2192,7 +2192,7 @@ def _logscroll_redshifts(min_redshift, z_step_factor, zmax):
     redshifts = [min_redshift]
     while redshifts[-1] < zmax:
         redshifts.append((redshifts[-1] + 1.0) * z_step_factor - 1.0)
-    return np.around(redshifts[::-1], decimals = 12)
+    return np.around(redshifts[::-1], decimals = 10)
 
 def run_coeval(
     *,
