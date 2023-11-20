@@ -2636,6 +2636,7 @@ def run_lightcone(
     init_box=None,
     perturb=None,
     random_seed=None,
+    scrollz = None,
     coeval_callback=None,
     coeval_callback_redshifts=1,
     use_interp_perturb_field=False,
@@ -2775,9 +2776,10 @@ def run_lightcone(
         )
 
         # Get the redshift through which we scroll and evaluate the ionization field.
-        scrollz = _logscroll_redshifts(
-            redshift, global_params.ZPRIME_STEP_FACTOR, max_redshift
-        )
+        if scrollz is None:
+            scrollz = _logscroll_redshifts(
+                redshift, global_params.ZPRIME_STEP_FACTOR, max_redshift
+            )
 
         if (
             flag_options.PHOTON_CONS
