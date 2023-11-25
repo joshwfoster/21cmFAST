@@ -1852,13 +1852,13 @@ LOG_SUPER_DEBUG("looping over box...");
                             // if (box_ct==0) {
                             //     printf("fcoll=%e\n", fcoll);
                             // }
-                            fcoll = (1.+curr_dens); // / growth_factor_z * zpp_growth[R_ct];
+                            //fcoll = (1.+curr_dens); // / growth_factor_z * zpp_growth[R_ct];
                             //fcoll = 1.;
 
                             ave_fcoll += fcoll;
 
-                            //del_fcoll_Rct[box_ct] = (1.+curr_dens)*fcoll;
-                            del_fcoll_Rct[box_ct] = fcoll;
+                            del_fcoll_Rct[box_ct] = (1.+curr_dens)*fcoll;
+                            //del_fcoll_Rct[box_ct] = fcoll;
                             //========== END YS DEBUG ==========
 
                             if (flag_options->USE_MINI_HALOS){
